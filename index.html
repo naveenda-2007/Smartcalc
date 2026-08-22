@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>SmartCalc — Scientific Calculator</title>
+<meta name="description" content="SmartCalc: a modern glassmorphism scientific calculator built with vanilla HTML, CSS and JavaScript.">
+
+<!-- Display face (LCD-style monospace) + UI face -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Decorative animated gradient mesh + graph-paper grid sitting behind the glass panel -->
+  <div class="backdrop" aria-hidden="true">
+    <div class="mesh mesh-a"></div>
+    <div class="mesh mesh-b"></div>
+    <div class="grid-overlay"></div>
+  </div>
+
+  <main class="app">
+
+    <div class="stage">
+
+      <!-- ============ CALCULATOR CARD ============ -->
+      <section class="calculator glass" aria-label="Calculator">
+
+        <header class="calc-header">
+          <div class="brand">
+            <span class="brand-mark" aria-hidden="true">∑</span>
+            <span class="brand-name">SmartCalc</span>
+          </div>
+
+          <div class="header-controls">
+            <button id="historyToggle" class="icon-btn" type="button" aria-label="Toggle calculation history" aria-pressed="false">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></svg>
+            </button>
+            <button id="themeToggle" class="icon-btn" type="button" aria-label="Toggle dark and light mode" aria-pressed="false">
+              <svg id="themeIcon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+            </button>
+          </div>
+        </header>
+
+        <!-- Basic / Scientific mode switch -->
+        <div class="mode-switch" role="tablist" aria-label="Calculator mode">
+          <button class="mode-btn active" type="button" role="tab" aria-selected="true" data-mode="basic">Basic</button>
+          <button class="mode-btn" type="button" role="tab" aria-selected="false" data-mode="scientific">Scientific</button>
+          <span class="mode-thumb" aria-hidden="true"></span>
+        </div>
+
+        <!-- Display -->
+        <div class="display">
+          <div class="expression" id="expression" aria-live="off">&nbsp;</div>
+          <div class="result-row">
+            <div class="result" id="result" aria-live="polite">0</div>
+            <button id="copyBtn" class="copy-btn" type="button" aria-label="Copy result to clipboard" title="Copy result">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></svg>
+            </button>
+          </div>
+        </div>
+
+        <!-- Keypad -->
+        <div class="keypad" id="keypad">
+
+          <!-- Scientific-only extra row (shown when scientific mode is active) -->
+          <div class="grid sci-grid" id="sciGrid">
+            <button class="key key-func" data-action="func" data-value="sin">sin</button>
+            <button class="key key-func" data-action="func" data-value="cos">cos</button>
+            <button class="key key-func" data-action="func" data-value="tan">tan</button>
+            <button class="key key-func" data-action="func" data-value="log">log</button>
+            <button class="key key-func" data-action="sqrt" data-value="√">√</button>
+
+            <button class="key key-func" data-action="constant" data-value="π">π</button>
+            <button class="key key-func" data-action="constant" data-value="e">e</button>
+            <button class="key key-func" data-action="square" data-value="x²">x²</button>
+            <button class="key key-func" data-action="power" data-value="^">x^y</button>
+            <button class="key key-func" data-action="reciprocal" data-value="1/x">1/x</button>
+          </div>
+
+          <!-- Core grid: always visible -->
+          <div class="grid basic-grid">
+            <button class="key key-utility" data-action="clear">AC</button>
+            <button class="key key-utility" data-action="paren" data-value="(">(</button>
+            <button class="key key-utility" data-action="paren" data-value=")">)</button>
+            <button class="key key-utility" data-action="backspace" aria-label="Backspace">⌫</button>
+
+            <button class="key key-num" data-action="digit" data-value="7">7</button>
+            <button class="key key-num" data-action="digit" data-value="8">8</button>
+            <button class="key key-num" data-action="digit" data-value="9">9</button>
+            <button class="key key-op" data-action="operator" data-value="÷">÷</button>
+
+            <button class="key key-num" data-action="digit" data-value="4">4</button>
+            <button class="key key-num" data-action="digit" data-value="5">5</button>
+            <button class="key key-num" data-action="digit" data-value="6">6</button>
+            <button class="key key-op" data-action="operator" data-value="×">×</button>
+
+            <button class="key key-num" data-action="digit" data-value="1">1</button>
+            <button class="key key-num" data-action="digit" data-value="2">2</button>
+            <button class="key key-num" data-action="digit" data-value="3">3</button>
+            <button class="key key-op" data-action="operator" data-value="−">−</button>
+
+            <button class="key key-num" data-action="digit" data-value="0">0</button>
+            <button class="key key-num" data-action="decimal" data-value=".">.</button>
+            <button class="key key-op" data-action="percent" data-value="%">%</button>
+            <button class="key key-op" data-action="operator" data-value="+">+</button>
+          </div>
+
+          <button class="key key-equals" data-action="equals">=</button>
+        </div>
+      </section>
+
+      <!-- ============ HISTORY PANEL ============ -->
+      <aside class="history-panel glass" id="historyPanel" aria-label="Calculation history" aria-hidden="true">
+        <div class="history-header">
+          <h2>History</h2>
+          <div class="history-actions">
+            <button id="clearHistory" class="text-btn" type="button">Clear</button>
+            <button id="closeHistory" class="icon-btn" type="button" aria-label="Close history">
+              <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </button>
+          </div>
+        </div>
+        <ul class="history-list" id="historyList">
+          <li class="history-empty" id="historyEmpty">No calculations yet</li>
+        </ul>
+      </aside>
+
+    </div>
+
+    <p class="hint">Keyboard supported: digits, <kbd>+ - * /</kbd>, <kbd>(</kbd> <kbd>)</kbd>, <kbd>Enter</kbd> =, <kbd>Backspace</kbd>, <kbd>Esc</kbd> AC</p>
+  </main>
+
+  <!-- Toast for copy confirmation / errors -->
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
