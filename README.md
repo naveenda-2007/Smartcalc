@@ -1,4 +1,4 @@
-Sure da 👍 Minimal ah clean README:
+
 
 # 🧮 SmartCalc
 
